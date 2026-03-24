@@ -1,20 +1,22 @@
 import axios from 'axios';
 
-// Use relative URL for API calls - Next.js rewrites will proxy to backend
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
-
+// ALWAYS use relative URLs like /api/auth/login
+// Next.js rewrites proxy /api/* → backend internally
+// This works in both browser (client-side) and server-side rendering
 const api = axios.create({
-  baseURL: API_URL, // Empty means relative URLs like '/api/auth/register'
+  baseURL: '',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add auth token to requests
+// Attach JWT token from localStorage on every request
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 });
@@ -31,8 +33,12 @@ export const authApi = {
 // Tenant API
 export const tenantApi = {
   getMyTenant: () => api.get('/api/tenants/me'),
-  updateMyTenant: (data: { name?: string; logo_url?: string; brand_color?: string; custom_domain?: string }) =>
-    api.put('/api/tenants/me', data),
+  updateMyTenant: (data: {
+    name?: string;
+    logo_url?: string;
+    brand_color?: string;
+    custom_domain?: string;
+  }) => api.put('/api/tenants/me', data),
 };
 
 // Monitor API
@@ -50,8 +56,13 @@ export const monitorApi = {
 // Incident API
 export const incidentApi = {
   list: (params?: { status?: string }) => api.get('/api/incidents', { params }),
-  create: (data: { title: string; message?: string; severity: string; status: string; monitor_id?: string }) =>
-    api.post('/api/incidents', data),
+  create: (data: {
+    title: string;
+    message?: string;
+    severity: string;
+    status: string;
+    monitor_id?: string;
+  }) => api.post('/api/incidents', data),
   update: (id: string, data: { title?: string; message?: string; severity?: string; status?: string }) =>
     api.put(`/api/incidents/${id}`, data),
   delete: (id: string) => api.delete(`/api/incidents/${id}`),
