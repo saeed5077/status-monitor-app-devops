@@ -1,0 +1,60 @@
+@Library('your-shared-library') _
+
+pipeline {
+  agent any
+
+  environment {
+    SERVICE_NAME = 'statuspage-frontend'
+    REGISTRY = 'your-registry/statuspage-frontend'
+    VALUES_FILE = 'frontend/values.yaml'
+  }
+
+  stages {
+    stage('Code Quality') {
+      steps {
+        sh 'npm ci && npm run lint'
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        script {
+          dockerBuild(REGISTRY, env.BUILD_NUMBER)
+        }
+      }
+    }
+
+    stage('Trivy Scan') {
+      steps {
+        script {
+          trivyScan(REGISTRY, env.BUILD_NUMBER)
+        }
+      }
+    }
+
+    stage('Push to Registry') {
+      steps {
+        script {
+          dockerPush(REGISTRY, env.BUILD_NUMBER)
+        }
+      }
+    }
+
+    stage('Deploy to Kubernetes') {
+      steps {
+        script {
+          helmDeploy(SERVICE_NAME, VALUES_FILE, env.BUILD_NUMBER)
+        }
+      }
+    }
+  }
+
+  post {
+    failure {
+      slackNotify('FAILED', SERVICE_NAME)
+    }
+    success {
+      slackNotify('SUCCESS', SERVICE_NAME)
+    }
+  }
+}

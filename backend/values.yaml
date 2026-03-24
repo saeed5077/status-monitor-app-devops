@@ -1,0 +1,37 @@
+service:
+  name: statuspage-backend
+  port: 8000
+  replicas: 2
+  type: ClusterIP
+
+image:
+  repository: your-registry/statuspage-backend
+  tag: latest
+  pullPolicy: Always
+
+env:
+  DATABASE_URL: ""
+  REDIS_URL: ""
+  SECRET_KEY: ""
+  SMTP_HOST: ""
+  SMTP_PORT: "587"
+  SMTP_USER: ""
+  SMTP_PASSWORD: ""
+  FROM_EMAIL: ""
+  FRONTEND_URL: ""
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+livenessProbe:
+  path: /health
+  port: 8000
+
+readinessProbe:
+  path: /health
+  port: 8000

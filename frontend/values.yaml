@@ -1,0 +1,31 @@
+service:
+  name: statuspage-frontend
+  port: 3000
+  replicas: 2
+  type: ClusterIP
+
+image:
+  repository: your-registry/statuspage-frontend
+  tag: latest
+  pullPolicy: Always
+
+env:
+  NEXT_PUBLIC_API_URL: ""
+  NEXT_PUBLIC_WS_URL: ""
+  NEXT_PUBLIC_APP_URL: ""
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+livenessProbe:
+  path: /
+  port: 3000
+
+readinessProbe:
+  path: /
+  port: 3000
