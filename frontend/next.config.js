@@ -4,7 +4,7 @@ const nextConfig = {
   async rewrites() {
     // BACKEND_URL is for Docker internal networking (http://backend:8000)
     // Falls back to localhost for running outside Docker
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
+    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     return [
       {
         source: '/api/:path*',
