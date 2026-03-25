@@ -9,6 +9,7 @@ class TenantBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     slug: str = Field(..., min_length=1, max_length=100)
     custom_domain: Optional[str] = Field(None, max_length=255)
+    domain_verified: Optional[bool] = Field(default=False)
     logo_url: Optional[str] = Field(None, max_length=500)
     brand_color: Optional[str] = Field(default="#3B82F6", pattern=r"^#[0-9A-Fa-f]{6}$")
 

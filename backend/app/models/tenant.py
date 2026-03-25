@@ -33,6 +33,7 @@ class Tenant(Base):
     name = Column(String(255), nullable=False)
     slug = Column(String(100), unique=True, nullable=False, index=True)
     custom_domain = Column(String(255), unique=True, nullable=True, index=True)
+    domain_verified = Column(Boolean, default=False)
     logo_url = Column(String(500), nullable=True)
     brand_color = Column(String(7), default="#3B82F6")  # Hex color
     owner_email = Column(String(255), nullable=False, index=True)

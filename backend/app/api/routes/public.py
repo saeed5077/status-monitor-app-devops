@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Query, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, cast, Date, and_
+from sqlalchemy import select, func, cast, Date, and_, Integer
 from datetime import datetime, timedelta
 from typing import List
 from app.core.database import get_db
@@ -71,7 +71,7 @@ async def get_public_status(
         result = await db.execute(
             select(
                 func.count().label("total"),
-                func.sum(func.cast(UptimeLog.is_up, int)).label("up")
+                func.sum(func.cast(UptimeLog.is_up, Integer)).label("up")
             )
             .where(
                 UptimeLog.monitor_id == monitor.id,
@@ -194,7 +194,7 @@ async def get_history(
             select(
                 cast(UptimeLog.checked_at, Date).label("date"),
                 func.count().label("total_checks"),
-                func.sum(func.cast(UptimeLog.is_up, int)).label("up_checks")
+                func.sum(func.cast(UptimeLog.is_up, Integer)).label("up_checks")
             )
             .where(
                 UptimeLog.monitor_id == monitor.id,

@@ -57,8 +57,14 @@ async def update_my_tenant(
     
     # Update fields
     update_data = request.model_dump(exclude_unset=True)
+    
+    # Reset domain_verified if custom_domain is changing
+    if 'custom_domain' in update_data and update_data['custom_domain'] != tenant.custom_domain:
+        tenant.domain_verified = False
+    
     for field, value in update_data.items():
-        setattr(tenant, field, value)
+        if field != 'domain_verified':  # domain_verified is managed by /api/domains/verify
+            setattr(tenant, field, value)
     
     await db.commit()
     await db.refresh(tenant)

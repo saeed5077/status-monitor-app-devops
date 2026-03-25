@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import json
 
-from app.api.routes import auth, tenants, monitors, incidents, subscribers, public
+from app.api.routes import auth, tenants, monitors, incidents, subscribers, public, domains
 from app.core.database import engine, Base
 from app.core.redis import get_redis, subscribe_channel
 from app.services.monitor_worker import start_monitor_scheduler, stop_monitor_scheduler
@@ -49,6 +49,7 @@ app.include_router(monitors.router)
 app.include_router(incidents.router)
 app.include_router(subscribers.router)
 app.include_router(public.router)
+app.include_router(domains.router)
 
 
 @app.get("/health")
