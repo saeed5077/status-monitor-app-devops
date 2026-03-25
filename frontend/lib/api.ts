@@ -85,4 +85,11 @@ export const publicApi = {
     api.get(`/api/public/${tenantSlugOrDomain}/history${days ? `?days=${days}` : ''}`),
 };
 
+// Domain Verification API
+export const domainApi = {
+  verify: (domain: string) =>
+    api.post('/api/domains/verify', { domain }),
+  getStatus: () => api.get('/api/domains/status'),
+};
+
 export default api;

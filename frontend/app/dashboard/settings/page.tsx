@@ -6,9 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tenant } from '@/types';
-import { tenantApi, authApi } from '@/lib/api';
+import { tenantApi, authApi, domainApi } from '@/lib/api';
 import { useToast } from '@/components/ui/toaster';
-import { CheckCircle, Globe, Copy, ExternalLink, Palette } from 'lucide-react';
+import { CheckCircle, Globe, Copy, ExternalLink, Palette, Shield, AlertTriangle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SettingsPage() {
@@ -16,6 +16,8 @@ export default function SettingsPage() {
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [domainStatus, setDomainStatus] = useState<{verified: boolean; message: string; dns_records: string[]} | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     logo_url: '',
@@ -186,7 +188,7 @@ export default function SettingsPage() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-indigo-600" />
-              <CardTitle className="text-lg">Custom Domain</CardTitle>
+              <CardTitle className="text-lg">Custom Domain & TLS</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -195,20 +197,97 @@ export default function SettingsPage() {
               <Input
                 placeholder="status.yourdomain.com"
                 value={formData.custom_domain}
-                onChange={(e) => setFormData({ ...formData, custom_domain: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, custom_domain: e.target.value });
+                  setDomainStatus(null);
+                }}
               />
             </div>
+
+            {/* Domain verification status */}
+            {domainStatus && (
+              <div className={`p-4 rounded-lg border text-sm ${
+                domainStatus.verified
+                  ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800'
+                  : 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800'
+              }`}>
+                <div className="flex items-start gap-2">
+                  {domainStatus.verified
+                    ? <Shield className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    : <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                  }
+                  <div>
+                    <p className={domainStatus.verified ? 'text-emerald-700 dark:text-emerald-400 font-medium' : 'text-amber-700 dark:text-amber-400 font-medium'}>
+                      {domainStatus.verified ? 'Domain Verified ✓' : 'Verification Failed'}
+                    </p>
+                    <p className="text-slate-600 dark:text-slate-400 mt-1">{domainStatus.message}</p>
+                    {domainStatus.dns_records.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        <p className="font-medium text-xs text-slate-500">DNS records found:</p>
+                        {domainStatus.dns_records.map((r, i) => (
+                          <code key={i} className="block text-xs bg-white/50 dark:bg-slate-800/50 px-2 py-1 rounded">{r}</code>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg space-y-2">
               <p className="font-medium text-sm">Setup Instructions:</p>
               <ol className="list-decimal list-inside space-y-1.5 text-sm text-slate-500">
-                <li>Add a <code className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">CNAME</code> record pointing your domain to our server</li>
-                <li>Point <strong className="text-slate-700 dark:text-slate-300">{formData.custom_domain || 'your domain'}</strong> to our server IP</li>
-                <li>SSL certificate will be automatically provisioned by Caddy</li>
+                <li>Add an <code className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">A</code> record or <code className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">CNAME</code> pointing <strong className="text-slate-700 dark:text-slate-300">{formData.custom_domain || 'your domain'}</strong> to our server</li>
+                <li>Click <strong className="text-slate-700 dark:text-slate-300">Verify Domain</strong> to confirm DNS is configured</li>
+                <li>Once verified, Caddy will auto-provision a TLS certificate via Let&apos;s Encrypt</li>
+                <li>Your status page will be accessible at <strong className="text-slate-700 dark:text-slate-300">https://{formData.custom_domain || 'your-domain.com'}</strong></li>
               </ol>
             </div>
-            <Button onClick={handleSave} disabled={saving} variant="outline" className="w-full">
-              Update Domain
-            </Button>
+
+            <div className="flex gap-2">
+              <Button onClick={handleSave} disabled={saving} variant="outline" className="flex-1">
+                Save Domain
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (!formData.custom_domain) {
+                    addToast({ title: 'Enter a domain first', variant: 'error' });
+                    return;
+                  }
+                  setVerifying(true);
+                  setDomainStatus(null);
+                  try {
+                    // Save domain first, then verify
+                    await tenantApi.updateMyTenant({ custom_domain: formData.custom_domain });
+                    const res = await domainApi.verify(formData.custom_domain);
+                    setDomainStatus(res.data);
+                    if (res.data.verified) {
+                      addToast({ title: 'Domain verified! TLS will be provisioned automatically.', variant: 'success' });
+                    } else {
+                      addToast({ title: 'DNS not pointing to our server yet', variant: 'error' });
+                    }
+                  } catch {
+                    addToast({ title: 'Verification failed', variant: 'error' });
+                  } finally {
+                    setVerifying(false);
+                  }
+                }}
+                disabled={verifying || !formData.custom_domain}
+                className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+              >
+                {verifying ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Checking DNS...
+                  </div>
+                ) : (
+                  <>
+                    <Shield className="w-4 h-4 mr-2" />
+                    Verify Domain
+                  </>
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
