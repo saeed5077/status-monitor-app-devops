@@ -23,10 +23,12 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      await authApi.register({ name, email, password });
-      router.push('/login');
+      const response = await authApi.register({ name, email, password });
+      // Auto-login: save token and redirect to dashboard
+      localStorage.setItem('token', response.data.access_token);
+      router.push('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      setError(err.response?.data?.detail || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -36,8 +38,8 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-indigo-500/25 transition-all duration-300">
               <Activity className="w-6 h-6 text-white" />
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
@@ -61,10 +63,10 @@ export default function RegisterPage() {
                 </div>
               )}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Full Name</label>
+                <label className="text-sm font-medium">Company / Organization Name</label>
                 <Input
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="Acme Inc."
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -88,14 +90,21 @@ export default function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  minLength={8}
                 />
+                <p className="text-xs text-muted-foreground">Must be at least 8 characters</p>
               </div>
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-indigo-500/25 transition-all duration-300"
                 disabled={loading}
               >
-                {loading ? 'Creating account...' : 'Create Account'}
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Creating account...
+                  </div>
+                ) : 'Create Account'}
               </Button>
             </form>
             <div className="mt-6 text-center text-sm">
