@@ -35,35 +35,35 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-indigo-500/25 transition-all duration-300">
+            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-emerald-500/25 transition-all duration-300">
               <Activity className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">
               StatusPage
             </span>
           </Link>
         </div>
 
-        <Card className="border-0 shadow-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur">
+        <Card className="border border-gray-800 shadow-2xl bg-gray-900/80 backdrop-blur">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
-            <CardDescription className="text-center">
+            <CardTitle className="text-2xl font-bold text-center text-gray-100">Create an account</CardTitle>
+            <CardDescription className="text-center text-gray-400">
               Enter your details to get started
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="p-3 text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg">
+                <div className="p-3 text-sm bg-red-900/30 text-red-400 rounded-lg border border-red-800/50">
                   {error}
                 </div>
               )}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Company / Organization Name</label>
+                <label className="text-sm font-medium text-gray-300">Company / Organization Name</label>
                 <Input
                   type="text"
                   placeholder="Acme Inc."
@@ -73,7 +73,7 @@ export default function RegisterPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Email</label>
+                <label className="text-sm font-medium text-gray-300">Email</label>
                 <Input
                   type="email"
                   placeholder="you@example.com"
@@ -83,7 +83,7 @@ export default function RegisterPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Password</label>
+                <label className="text-sm font-medium text-gray-300">Password</label>
                 <Input
                   type="password"
                   placeholder="••••••••"
@@ -92,11 +92,11 @@ export default function RegisterPage() {
                   required
                   minLength={8}
                 />
-                <p className="text-xs text-muted-foreground">Must be at least 8 characters</p>
+                <p className="text-xs text-gray-500">Must be at least 8 characters</p>
               </div>
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-indigo-500/25 transition-all duration-300"
+                className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-lg hover:shadow-emerald-500/25 transition-all duration-300"
                 disabled={loading}
               >
                 {loading ? (
@@ -107,9 +107,9 @@ export default function RegisterPage() {
                 ) : 'Create Account'}
               </Button>
             </form>
-            <div className="mt-6 text-center text-sm">
+            <div className="mt-6 text-center text-sm text-gray-400">
               Already have an account?{' '}
-              <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-medium">
+              <Link href="/login" className="text-emerald-400 hover:text-emerald-300 font-medium">
                 Sign in
               </Link>
             </div>

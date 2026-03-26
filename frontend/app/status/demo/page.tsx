@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 // Static demo data — no API calls needed
 const DEMO_DATA = {
-  tenant: { name: 'Acme Inc.', brand_color: '#6366f1' },
+  tenant: { name: 'Acme Inc.', brand_color: '#10b981' },
   overall_status: 'operational',
   monitors: [
     { id: '1', name: 'API Server', status: 'operational', uptime: 99.98 },
@@ -58,17 +58,17 @@ export default function DemoStatusPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen bg-gray-950">
       {/* Demo banner */}
-      <div className="bg-indigo-600 text-white text-center py-2.5 text-sm font-medium">
+      <div className="bg-emerald-600 text-white text-center py-2.5 text-sm font-medium">
         🎯 This is a demo status page.{' '}
-        <Link href="/register" className="underline font-bold hover:text-indigo-200 transition-colors">
+        <Link href="/register" className="underline font-bold hover:text-emerald-200 transition-colors">
           Create your own for free →
         </Link>
       </div>
 
       {/* Header */}
-      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+      <header className="bg-gray-900 border-b border-gray-800">
         <div className="max-w-3xl mx-auto px-4 py-6 flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold" style={{ backgroundColor: brandColor }}>
             A
@@ -89,8 +89,8 @@ export default function DemoStatusPage() {
 
         {/* Services */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Services</h3>
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm divide-y divide-slate-100 dark:divide-slate-800">
+          <h3 className="text-lg font-semibold text-gray-100">Services</h3>
+          <div className="bg-gray-900 rounded-xl border border-gray-800 shadow-sm divide-y divide-gray-800">
             {DEMO_DATA.monitors.map((monitor) => {
               const bars = uptimeBarsMap[monitor.id];
               return (
@@ -98,11 +98,11 @@ export default function DemoStatusPage() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="font-medium text-slate-900 dark:text-white">{monitor.name}</span>
+                      <span className="font-medium text-gray-100">{monitor.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-slate-500">{monitor.uptime.toFixed(2)}% uptime</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                      <span className="text-sm text-gray-500">{monitor.uptime.toFixed(2)}% uptime</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                         operational
                       </span>
                     </div>
@@ -119,7 +119,7 @@ export default function DemoStatusPage() {
                       />
                     ))}
                   </div>
-                  <div className="flex justify-between text-xs text-slate-400 mt-1">
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
                     <span>90 days ago</span>
                     <span>Today</span>
                   </div>
@@ -133,7 +133,7 @@ export default function DemoStatusPage() {
         <div className="space-y-3">
           <button
             onClick={() => setShowResolved(!showResolved)}
-            className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white hover:text-indigo-600 transition-colors"
+            className="flex items-center gap-2 text-lg font-semibold text-gray-100 hover:text-emerald-400 transition-colors"
           >
             Past Incidents ({DEMO_DATA.resolved_incidents.length})
             {showResolved ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -142,17 +142,17 @@ export default function DemoStatusPage() {
           {showResolved && (
             <div className="space-y-3">
               {DEMO_DATA.resolved_incidents.map((incident) => (
-                <div key={incident.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm opacity-75">
+                <div key={incident.id} className="bg-gray-900 rounded-xl border border-gray-800 p-4 shadow-sm opacity-75">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h4 className="font-medium text-slate-700 dark:text-slate-300">{incident.title}</h4>
-                      <p className="text-sm text-slate-500 mt-1">{incident.message}</p>
+                      <h4 className="font-medium text-gray-300">{incident.title}</h4>
+                      <p className="text-sm text-gray-500 mt-1">{incident.message}</p>
                     </div>
-                    <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full text-xs font-medium">
+                    <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-medium">
                       Resolved
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-2">
+                  <p className="text-xs text-gray-500 mt-2">
                     Resolved: {new Date(incident.resolved_at).toLocaleDateString()}
                   </p>
                 </div>
@@ -162,17 +162,17 @@ export default function DemoStatusPage() {
         </div>
 
         {/* Subscribe (demo) */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
             <Mail className="w-5 h-5" style={{ color: brandColor }} />
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Subscribe to Updates</h3>
+            <h3 className="text-lg font-semibold text-gray-100">Subscribe to Updates</h3>
           </div>
-          <p className="text-sm text-slate-500 mb-4">Get notified when services go down or incidents are resolved.</p>
+          <p className="text-sm text-gray-500 mb-4">Get notified when services go down or incidents are resolved.</p>
           <div className="flex gap-2">
             <input
               type="email"
               placeholder="your@email.com"
-              className="flex-1 px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm"
+              className="flex-1 px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-800 text-sm text-gray-200"
               disabled
             />
             <Link href="/register">
@@ -181,15 +181,15 @@ export default function DemoStatusPage() {
               </button>
             </Link>
           </div>
-          <p className="mt-2 text-xs text-indigo-500">Sign up to enable email subscriptions on your own status page.</p>
+          <p className="mt-2 text-xs text-emerald-500">Sign up to enable email subscriptions on your own status page.</p>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 py-6 mt-8">
+      <footer className="border-t border-gray-800 py-6 mt-8">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <p className="text-sm text-slate-400 mb-2">© {new Date().getFullYear()} Acme Inc.</p>
-          <Link href="/register" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
+          <p className="text-sm text-gray-500 mb-2">© {new Date().getFullYear()} Acme Inc.</p>
+          <Link href="/register" className="text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
             Want a status page like this? Get started free →
           </Link>
         </div>

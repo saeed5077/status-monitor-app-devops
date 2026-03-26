@@ -103,18 +103,18 @@ export default function IncidentsPage() {
 
   const getSeverityConfig = (severity: string) => {
     switch (severity) {
-      case 'critical': return { color: 'bg-red-500', badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' };
-      case 'major': return { color: 'bg-orange-500', badge: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' };
-      default: return { color: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' };
+      case 'critical': return { color: 'bg-red-500', badge: 'bg-red-500/10 text-red-400 border border-red-500/20' };
+      case 'major': return { color: 'bg-orange-500', badge: 'bg-orange-500/10 text-orange-400 border border-orange-500/20' };
+      default: return { color: 'bg-amber-500', badge: 'bg-amber-500/10 text-amber-400 border border-amber-500/20' };
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'resolved': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
-      case 'monitoring': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
-      case 'identified': return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400';
-      default: return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
+      case 'resolved': return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+      case 'monitoring': return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
+      case 'identified': return 'bg-teal-500/10 text-teal-400 border border-teal-500/20';
+      default: return 'bg-orange-500/10 text-orange-400 border border-orange-500/20';
     }
   };
 
@@ -137,12 +137,12 @@ export default function IncidentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Incidents</h1>
-          <p className="text-slate-500 mt-1">Track and manage service incidents</p>
+          <h1 className="text-3xl font-bold text-gray-100">Incidents</h1>
+          <p className="text-gray-500 mt-1">Track and manage service incidents</p>
         </div>
         <Button
           onClick={() => setShowAddModal(true)}
-          className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-indigo-500/25 transition-all"
+          className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-lg hover:shadow-emerald-500/25 transition-all"
         >
           <Plus className="w-4 h-4 mr-2" />
           Report Incident
@@ -150,20 +150,20 @@ export default function IncidentsPage() {
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 w-fit">
+      <div className="flex gap-1 bg-gray-800 rounded-lg p-1 w-fit">
         {(['all', 'active', 'resolved'] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
               filter === f
-                ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white'
-                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                ? 'bg-gray-700 shadow-sm text-gray-100'
+                : 'text-gray-500 hover:text-gray-300'
             }`}
           >
             {f.charAt(0).toUpperCase() + f.slice(1)}
             {f === 'active' && (
-              <span className="ml-1.5 text-xs bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 px-1.5 py-0.5 rounded-full">
+              <span className="ml-1.5 text-xs bg-orange-500/10 text-orange-400 border border-orange-500/20 px-1.5 py-0.5 rounded-full">
                 {incidents.filter(i => i.status !== 'resolved').length}
               </span>
             )}
@@ -172,34 +172,34 @@ export default function IncidentsPage() {
       </div>
 
       {/* Incidents List */}
-      <Card className="border-0 shadow-sm">
+      <Card className="border border-gray-800 shadow-sm bg-gray-900">
         <CardContent className="p-0">
           {filteredIncidents.length === 0 ? (
             <div className="p-12 text-center">
-              <CheckCircle className="w-16 h-16 text-emerald-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
+              <CheckCircle className="w-16 h-16 text-emerald-500/20 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-300 mb-2">
                 {filter === 'active' ? 'No active incidents' : filter === 'resolved' ? 'No resolved incidents' : 'No incidents'}
               </h3>
-              <p className="text-slate-500">
+              <p className="text-gray-500">
                 {filter === 'active' ? 'All services are running smoothly!' : 'No incidents to show.'}
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+            <div className="divide-y divide-gray-800">
               {filteredIncidents.map((incident) => {
                 const sevCfg = getSeverityConfig(incident.severity);
                 const currentIdx = STATUS_FLOW.indexOf(incident.status as typeof STATUS_FLOW[number]);
                 const nextStatus = currentIdx >= 0 && currentIdx < STATUS_FLOW.length - 1 ? STATUS_FLOW[currentIdx + 1] : null;
 
                 return (
-                  <div key={incident.id} className="p-5 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                  <div key={incident.id} className="p-5 hover:bg-gray-800/30 transition-colors">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex gap-3 flex-1">
                         <div className={`w-2.5 h-2.5 rounded-full mt-2 flex-shrink-0 ${sevCfg.color}`} />
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-slate-900 dark:text-white">{incident.title}</h4>
+                          <h4 className="font-semibold text-gray-100">{incident.title}</h4>
                           {incident.message && (
-                            <p className="text-sm text-slate-500 mt-1">{incident.message}</p>
+                            <p className="text-sm text-gray-500 mt-1">{incident.message}</p>
                           )}
                           <div className="flex flex-wrap items-center gap-2 mt-3">
                             <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${sevCfg.badge}`}>
@@ -208,11 +208,11 @@ export default function IncidentsPage() {
                             <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(incident.status)}`}>
                               {incident.status}
                             </span>
-                            <span className="text-xs text-slate-400">
+                            <span className="text-xs text-gray-500">
                               {new Date(incident.created_at).toLocaleString()}
                             </span>
                             {incident.duration_minutes && incident.status === 'resolved' && (
-                              <span className="text-xs text-slate-400">
+                              <span className="text-xs text-gray-500">
                                 Duration: {incident.duration_minutes < 60
                                   ? `${incident.duration_minutes} min`
                                   : `${Math.floor(incident.duration_minutes / 60)}h ${incident.duration_minutes % 60}m`}
@@ -227,12 +227,12 @@ export default function IncidentsPage() {
                                 const isActive = STATUS_FLOW.indexOf(incident.status as typeof STATUS_FLOW[number]) >= i;
                                 return (
                                   <div key={s} className="flex items-center gap-1">
-                                    <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
-                                    <span className={`text-xs ${isActive ? 'text-indigo-600 font-medium' : 'text-slate-400'}`}>
+                                    <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-gray-700'}`} />
+                                    <span className={`text-xs ${isActive ? 'text-emerald-400 font-medium' : 'text-gray-600'}`}>
                                       {s}
                                     </span>
                                     {i < STATUS_FLOW.length - 1 && (
-                                      <ArrowRight className="w-3 h-3 text-slate-300 mx-0.5" />
+                                      <ArrowRight className="w-3 h-3 text-gray-700 mx-0.5" />
                                     )}
                                   </div>
                                 );
@@ -248,13 +248,13 @@ export default function IncidentsPage() {
                             size="sm"
                             variant="outline"
                             onClick={() => handleProgressStatus(incident)}
-                            className="text-xs"
+                            className="text-xs border-gray-700 text-gray-300 hover:bg-gray-800"
                           >
                             → {nextStatus}
                           </Button>
                         )}
                         {incident.status !== 'resolved' && (
-                          <Button size="sm" variant="outline" onClick={() => handleResolve(incident.id)} className="text-xs text-emerald-600 border-emerald-200 hover:bg-emerald-50">
+                          <Button size="sm" variant="outline" onClick={() => handleResolve(incident.id)} className="text-xs text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10">
                             <CheckCircle className="w-3.5 h-3.5 mr-1" />
                             Resolve
                           </Button>
@@ -274,14 +274,14 @@ export default function IncidentsPage() {
 
       {/* Add Incident Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <Card className="w-full max-w-md shadow-2xl border-0">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <Card className="w-full max-w-md shadow-2xl border border-gray-800 bg-gray-900">
             <CardHeader>
-              <CardTitle>Report Incident</CardTitle>
+              <CardTitle className="text-gray-100">Report Incident</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm font-medium">Title</label>
+                <label className="text-sm font-medium text-gray-300">Title</label>
                 <Input
                   placeholder="e.g. API response times elevated"
                   value={newIncident.title}
@@ -289,18 +289,18 @@ export default function IncidentsPage() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Description</label>
+                <label className="text-sm font-medium text-gray-300">Description</label>
                 <textarea
-                  className="w-full h-20 rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full h-20 rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-200 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="Additional details about the incident..."
                   value={newIncident.message}
                   onChange={(e) => setNewIncident({ ...newIncident, message: e.target.value })}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Severity</label>
+                <label className="text-sm font-medium text-gray-300">Severity</label>
                 <select
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                  className="w-full h-10 rounded-md border border-gray-700 bg-gray-800 px-3 text-sm text-gray-200"
                   value={newIncident.severity}
                   onChange={(e) => setNewIncident({ ...newIncident, severity: e.target.value })}
                 >
@@ -310,9 +310,9 @@ export default function IncidentsPage() {
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium">Affected Monitor (optional)</label>
+                <label className="text-sm font-medium text-gray-300">Affected Monitor (optional)</label>
                 <select
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                  className="w-full h-10 rounded-md border border-gray-700 bg-gray-800 px-3 text-sm text-gray-200"
                   value={newIncident.monitor_id}
                   onChange={(e) => setNewIncident({ ...newIncident, monitor_id: e.target.value })}
                 >
@@ -323,11 +323,11 @@ export default function IncidentsPage() {
                 </select>
               </div>
               <div className="flex gap-2 pt-2">
-                <Button variant="outline" className="flex-1" onClick={() => setShowAddModal(false)}>
+                <Button variant="outline" className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800" onClick={() => setShowAddModal(false)}>
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  className="flex-1 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700"
                   onClick={handleAddIncident}
                 >
                   Report Incident
