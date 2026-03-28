@@ -24,9 +24,9 @@ export default function RegisterPage() {
 
     try {
       const response = await authApi.register({ name, email, password });
-      // Auto-login: save token and redirect to dashboard
-      localStorage.setItem('token', response.data.access_token);
-      router.push('/dashboard');
+      // Redirect to verification page
+      const userEmail = response.data?.data?.email || email;
+      router.push(`/verify-email?email=${encodeURIComponent(userEmail)}`);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed. Please try again.');
     } finally {

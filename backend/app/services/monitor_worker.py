@@ -106,8 +106,9 @@ async def check_monitor(monitor_id: str):
                         f'{{"type": "incident_created", "monitor_id": "{monitor.id}", "incident_id": "{incident.id}"}}'
                     )
                     
-                    # Send notifications
-                    await send_incident_created_notification(tenant, incident, monitor, subscribers)
+                    # Send notifications if enabled
+                    if monitor.send_email_alerts:
+                        await send_incident_created_notification(tenant, incident, monitor, subscribers)
                     
                 elif monitor.status == MonitorStatus.OPERATIONAL and previous_status == MonitorStatus.OUTAGE:
                     # Find and resolve open incident for this monitor
@@ -133,8 +134,9 @@ async def check_monitor(monitor_id: str):
                             f'{{"type": "incident_resolved", "monitor_id": "{monitor.id}", "incident_id": "{incident.id}"}}'
                         )
                         
-                        # Send notifications
-                        await send_incident_resolved_notification(tenant, incident, monitor, subscribers, duration_minutes)
+                        # Send notifications if enabled
+                        if monitor.send_email_alerts:
+                            await send_incident_resolved_notification(tenant, incident, monitor, subscribers, duration_minutes)
             
             await db.commit()
             

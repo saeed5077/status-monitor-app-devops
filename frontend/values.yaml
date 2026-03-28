@@ -9,7 +9,13 @@ image:
   tag: latest
   pullPolicy: Always
 
-env:
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+secretEnv:
   NEXT_PUBLIC_API_URL: ""
   NEXT_PUBLIC_WS_URL: ""
   NEXT_PUBLIC_APP_URL: ""

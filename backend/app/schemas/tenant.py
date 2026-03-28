@@ -30,6 +30,7 @@ class TenantUpdate(BaseModel):
 class TenantResponse(TenantBase):
     id: UUID
     owner_email: EmailStr
+    is_email_verified: bool
     created_at: datetime
 
     class Config:
@@ -41,6 +42,7 @@ class MonitorBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     url: str = Field(..., min_length=1, max_length=500)
     check_interval_seconds: int = Field(default=60, ge=60, le=3600)
+    send_email_alerts: bool = Field(default=True)
 
 
 class MonitorCreate(MonitorBase):
@@ -51,6 +53,7 @@ class MonitorUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     url: Optional[str] = Field(None, min_length=1, max_length=500)
     check_interval_seconds: Optional[int] = Field(None, ge=60, le=3600)
+    send_email_alerts: Optional[bool] = None
 
 
 class MonitorResponse(MonitorBase):
@@ -138,6 +141,15 @@ class SubscriberResponse(SubscriberBase):
 
 
 # Auth Schemas
+class VerifyEmailRequest(BaseModel):
+    email: EmailStr
+    otp: str = Field(..., min_length=6, max_length=6)
+
+
+class ResendOtpRequest(BaseModel):
+    email: EmailStr
+
+
 class RegisterRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     email: EmailStr

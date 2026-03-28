@@ -89,3 +89,7 @@ tsconfig.tsbuildinfo
 
 # Caddy (not needed until production deployment)
 caddy/
+helm-fe/
+helm-be/
+helm/
+psql-redis/

@@ -19,8 +19,8 @@ export default function MonitorsPage() {
   const [editingMonitor, setEditingMonitor] = useState<Monitor | null>(null);
   const [selectedMonitor, setSelectedMonitor] = useState<MonitorWithUptime | null>(null);
   const [uptimeLoading, setUptimeLoading] = useState(false);
-  const [newMonitor, setNewMonitor] = useState({ name: '', url: '', check_interval_seconds: 60 });
-  const [editForm, setEditForm] = useState({ name: '', url: '', check_interval_seconds: 60 });
+  const [newMonitor, setNewMonitor] = useState({ name: '', url: '', check_interval_seconds: 60, send_email_alerts: true });
+  const [editForm, setEditForm] = useState({ name: '', url: '', check_interval_seconds: 60, send_email_alerts: true });
 
   useEffect(() => {
     loadMonitors();
@@ -45,7 +45,7 @@ export default function MonitorsPage() {
     try {
       await monitorApi.create(newMonitor);
       setShowAddModal(false);
-      setNewMonitor({ name: '', url: '', check_interval_seconds: 60 });
+      setNewMonitor({ name: '', url: '', check_interval_seconds: 60, send_email_alerts: true });
       loadMonitors();
       addToast({ title: 'Monitor created!', variant: 'success' });
     } catch {
@@ -95,6 +95,7 @@ export default function MonitorsPage() {
       name: monitor.name,
       url: monitor.url,
       check_interval_seconds: monitor.check_interval_seconds,
+      send_email_alerts: monitor.send_email_alerts !== false, // default to true if undefined
     });
   };
 
@@ -310,6 +311,18 @@ export default function MonitorsPage() {
                   <option value={600}>Every 10 minutes</option>
                 </select>
               </div>
+              <div className="flex items-center gap-2 pt-2 pb-2">
+                <input
+                  type="checkbox"
+                  id="new-monitor-alerts"
+                  className="w-4 h-4 rounded border-gray-700 bg-gray-800 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-gray-900 cursor-pointer"
+                  checked={newMonitor.send_email_alerts}
+                  onChange={(e) => setNewMonitor({ ...newMonitor, send_email_alerts: e.target.checked })}
+                />
+                <label htmlFor="new-monitor-alerts" className="text-sm font-medium text-gray-300 cursor-pointer">
+                  Send email alerts on status change
+                </label>
+              </div>
               <div className="flex gap-2 pt-2">
                 <Button variant="outline" className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800" onClick={() => setShowAddModal(false)}>
                   Cancel
@@ -359,6 +372,18 @@ export default function MonitorsPage() {
                   <option value={300}>Every 5 minutes</option>
                   <option value={600}>Every 10 minutes</option>
                 </select>
+              </div>
+              <div className="flex items-center gap-2 pt-2 pb-2">
+                <input
+                  type="checkbox"
+                  id="edit-monitor-alerts"
+                  className="w-4 h-4 rounded border-gray-700 bg-gray-800 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-gray-900 cursor-pointer"
+                  checked={editForm.send_email_alerts}
+                  onChange={(e) => setEditForm({ ...editForm, send_email_alerts: e.target.checked })}
+                />
+                <label htmlFor="edit-monitor-alerts" className="text-sm font-medium text-gray-300 cursor-pointer">
+                  Send email alerts on status change
+                </label>
               </div>
               <div className="flex gap-2 pt-2">
                 <Button variant="outline" className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800" onClick={() => setEditingMonitor(null)}>

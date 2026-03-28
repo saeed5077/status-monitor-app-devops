@@ -56,8 +56,19 @@ export default function LoginPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="p-3 text-sm bg-red-900/30 text-red-400 rounded-lg border border-red-800/50">
-                  {error}
+                <div className="p-3 text-sm bg-red-900/30 text-red-400 rounded-lg border border-red-800/50 flex flex-col gap-2">
+                  <span>{error}</span>
+                  {error === 'Email not verified' && (
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-red-800/50 hover:bg-red-900/50 mt-1"
+                      onClick={() => router.push(`/verify-email?email=${encodeURIComponent(email)}`)}
+                    >
+                      Verify Email Now
+                    </Button>
+                  )}
                 </div>
               )}
               <div className="space-y-2">

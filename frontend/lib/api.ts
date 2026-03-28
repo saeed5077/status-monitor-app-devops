@@ -21,13 +21,16 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Auth API
 export const authApi = {
   register: (data: { name: string; email: string; password: string }) =>
     api.post('/api/auth/register', data),
   login: (data: { email: string; password: string }) =>
     api.post('/api/auth/login', data),
   getMe: () => api.get('/api/auth/me'),
+  verifyEmail: (data: { email: string; otp: string }) => 
+    api.post('/api/auth/verify-email', data),
+  resendOtp: (data: { email: string }) => 
+    api.post('/api/auth/resend-otp', data),
 };
 
 // Tenant API
