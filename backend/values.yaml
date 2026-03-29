@@ -19,6 +19,7 @@ existingSecret: "statuspage-backend-secrets"
 
 env:
   DATABASE_URL: ""
+  REDIS_URL: ""
   USE_NEON_DB: "true"
   USE_CLOUD_REDIS: "true"
   ALGORITHM: "HS256"
@@ -34,11 +35,3 @@ resources:
   limits:
     cpu: "500m"
     memory: "512Mi"
-
-livenessProbe:
-  path: /health
-  port: 8000
-
-readinessProbe:
-  path: /health
-  port: 8000
