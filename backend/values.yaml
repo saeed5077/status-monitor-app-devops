@@ -5,7 +5,7 @@ service:
   type: ClusterIP
 
 image:
-  repository: your-registry/statuspage-backend
+  repository: gcr.io/opsdev-org/status-be
   tag: latest
   pullPolicy: Always
 
