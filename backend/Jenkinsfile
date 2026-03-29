@@ -13,7 +13,8 @@ pipeline {
         VALUE_FILE = 'backend/values.yaml'
         HELM_DEP_NAME = 'status-be'
         IMAGE = 'status-be'
-        CREDENTIAL_ID = "gke-jenkins"
+        CREDENTIAL_ID = 'gke-jenkins'
+        REPO = 'backend'
     }
 
     stages {
@@ -24,7 +25,7 @@ pipeline {
 
                 script {
                   
-                    dockerHelmTask.call(env.CREDENTIAL_ID,env.IMAGE,env.VALUE_FILE,env.HELM_DEP_NAME)
+                    dockerHelmTask.call(env.CREDENTIAL_ID,env.IMAGE,env.VALUE_FILE,env.HELM_DEP_NAME,env.REPO)
                 }
 
             }
