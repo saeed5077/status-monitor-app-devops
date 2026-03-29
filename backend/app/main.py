@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import json
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.routes import auth, tenants, monitors, incidents, subscribers, public, domains
 from app.core.database import engine, Base
@@ -32,6 +33,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+# Instrument the FastAPI app with Prometheus metrics
+Instrumentator().instrument(app).expose(app)
 
 # CORS middleware
 app.add_middleware(
