@@ -1,6 +1,3 @@
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from jinja2 import Template
 from app.core.config import get_settings
 from app.models.tenant import Tenant, Subscriber, Incident, Monitor
@@ -100,6 +97,35 @@ INCIDENT_RESOLVED_TEMPLATE = """
 </html>
 """
 
+OTP_EMAIL_TEMPLATE = """
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .otp-box { background-color: #f8f8f8; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0; border: 1px solid #eee; }
+        .otp-code { font-size: 32px; font-weight: bold; letter-spacing: 5px; color: {{ brand_color }}; }
+        .footer { margin-top: 30px; font-size: 12px; color: #666; border-top: 1px solid #eee; padding-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Verify Your Email</h2>
+        <p>Hello,</p>
+        <p>Thank you for signing up for <strong>{{ tenant_name }}</strong>. To complete your registration, please use the following verification code:</p>
+        <div class="otp-box">
+            <div class="otp-code">{{ otp_code }}</div>
+        </div>
+        <p>This code will expire in 15 minutes.</p>
+        <div class="footer">
+            <p>If you didn't attempt to sign up, you can safely ignore this email.</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
 
 def get_severity_color(severity: str) -> str:
     colors = {
@@ -111,27 +137,26 @@ def get_severity_color(severity: str) -> str:
 
 
 async def send_email(to_email: str, subject: str, html_content: str):
-    """Send email via SMTP"""
-    if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
+    """Send email via Resend API"""
+    if not hasattr(settings, 'RESEND_API_KEY') or not settings.RESEND_API_KEY:
         print(f"[EMAIL] Would send to {to_email}: {subject}")
         return
     
     try:
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = subject
-        msg['From'] = settings.FROM_EMAIL or settings.SMTP_USER
-        msg['To'] = to_email
+        import resend
+        resend.api_key = settings.RESEND_API_KEY
         
-        msg.attach(MIMEText(html_content, 'html'))
+        params = {
+            "from": settings.FROM_EMAIL or "onboarding@resend.dev",
+            "to": [to_email],
+            "subject": subject,
+            "html": html_content,
+        }
+        resend.Emails.send(params)
         
-        with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-            server.starttls()
-            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-            server.sendmail(msg['From'], [to_email], msg.as_string())
-        
-        print(f"[EMAIL] Sent to {to_email}: {subject}")
+        print(f"[EMAIL] Sent via Resend to {to_email}: {subject}")
     except Exception as e:
-        print(f"[EMAIL ERROR] Failed to send to {to_email}: {e}")
+        print(f"[EMAIL ERROR] Failed to send via Resend to {to_email}: {e}")
 
 
 async def send_confirmation_email(tenant: Tenant, subscriber: Subscriber):
@@ -241,3 +266,15 @@ async def notify_monitor_up(tenant: Tenant, monitor: Monitor, subscribers: list)
     # This would resolve an incident and send notifications
     # Implementation in monitor_worker
     pass
+
+
+async def send_otp_email(email: str, tenant_name: str, brand_color: str, otp_code: str):
+    """Send 6-digit OTP email for account verification"""
+    template = Template(OTP_EMAIL_TEMPLATE)
+    html = template.render(
+        tenant_name=tenant_name,
+        brand_color=brand_color,
+        otp_code=otp_code
+    )
+    
+    await send_email(email, f"Verify your email for {tenant_name}", html)

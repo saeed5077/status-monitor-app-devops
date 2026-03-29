@@ -58,6 +58,10 @@ async def update_my_tenant(
     # Update fields
     update_data = request.model_dump(exclude_unset=True)
     
+    # Fix Postgres 500 Constraint Error: Convert empty string to None so it saves as NULL
+    if 'custom_domain' in update_data and update_data['custom_domain'] == "":
+        update_data['custom_domain'] = None
+    
     # Reset domain_verified if custom_domain is changing
     if 'custom_domain' in update_data and update_data['custom_domain'] != tenant.custom_domain:
         tenant.domain_verified = False

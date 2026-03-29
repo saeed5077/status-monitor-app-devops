@@ -9,16 +9,23 @@ image:
   tag: latest
   pullPolicy: Always
 
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+existingSecret: "statuspage-backend-secrets"
+
 env:
   DATABASE_URL: ""
-  REDIS_URL: ""
-  SECRET_KEY: ""
-  SMTP_HOST: ""
-  SMTP_PORT: "587"
-  SMTP_USER: ""
-  SMTP_PASSWORD: ""
-  FROM_EMAIL: ""
-  FRONTEND_URL: ""
+  USE_NEON_DB: "true"
+  USE_CLOUD_REDIS: "true"
+  ALGORITHM: "HS256"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "1440"
+  FROM_EMAIL: "no-reply@status.opsdev.in"
+  FRONTEND_URL: "https://status.opsdev.in"
+  EXPECTED_CNAME_TARGET: "status.opsdev.in"
 
 resources:
   requests:

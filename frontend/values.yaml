@@ -9,6 +9,14 @@ image:
   tag: latest
   pullPolicy: Always
 
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+existingSecret: "" # Set to "statuspage-frontend-secrets" if you want to mount the frontend secret file
+
 env:
   NEXT_PUBLIC_API_URL: ""
   NEXT_PUBLIC_WS_URL: ""

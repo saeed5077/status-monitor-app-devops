@@ -4,11 +4,12 @@ from app.core.config import get_settings
 settings = get_settings()
 redis_client = None
 
+active_redis_url = settings.CLOUD_REDIS_URL if settings.USE_CLOUD_REDIS else settings.REDIS_URL
 
 async def get_redis():
     global redis_client
     if redis_client is None:
-        redis_client = await redis.from_url(settings.REDIS_URL, decode_responses=True)
+        redis_client = await redis.from_url(active_redis_url, decode_responses=True)
     return redis_client
 
 

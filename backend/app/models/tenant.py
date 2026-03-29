@@ -38,6 +38,9 @@ class Tenant(Base):
     brand_color = Column(String(7), default="#3B82F6")  # Hex color
     owner_email = Column(String(255), nullable=False, index=True)
     owner_password_hash = Column(String(255), nullable=False)
+    is_email_verified = Column(Boolean, default=False)
+    email_otp = Column(String(6), nullable=True)
+    email_otp_expires_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationships
@@ -55,6 +58,7 @@ class Monitor(Base):
     url = Column(String(500), nullable=False)
     check_interval_seconds = Column(Integer, default=60)  # 60, 300, 600
     status = Column(Enum(MonitorStatus), default=MonitorStatus.OPERATIONAL)
+    send_email_alerts = Column(Boolean, default=True)
     last_checked_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     

@@ -15,6 +15,7 @@ export interface Monitor {
   name: string;
   url: string;
   check_interval_seconds: number;
+  send_email_alerts: boolean;
   status: 'operational' | 'degraded' | 'outage';
   last_checked_at: string | null;
   created_at: string;
