@@ -1,5 +1,5 @@
 service:
-  name: statuspage-backend
+  name: status-be-service
   port: 8000
   replicas: 2
   type: ClusterIP
@@ -11,7 +11,7 @@ image:
 
 hpa:
   enabled: true
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 5
   targetCPUUtilizationPercentage: 80
 
