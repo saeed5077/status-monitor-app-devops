@@ -1,60 +1,35 @@
-@Library('your-shared-library') _
+@Library('jenkins-shared-library') _
 
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    SERVICE_NAME = 'statuspage-frontend'
-    REGISTRY = 'your-registry/statuspage-frontend'
-    VALUES_FILE = 'frontend/values.yaml'
-  }
-
-  stages {
-    stage('Code Quality') {
-      steps {
-        sh 'npm ci && npm run lint'
-      }
+   parameters {
+        string defaultValue: 'main-v2', name: 'branchName'
     }
 
-    stage('Build Docker Image') {
-      steps {
-        script {
-          dockerBuild(REGISTRY, env.BUILD_NUMBER)
+    environment {
+
+        IMAGE_NAME = 'gcr.io/opsdev-org/status-fe'
+        VALUE_FILE = 'frontend/values.yaml'
+        HELM_DEP_NAME = 'status-fe'
+        IMAGE = 'status-fe'
+        CREDENTIAL_ID = 'gke-jenkins'
+        REPO = 'frontend'
+    }
+
+    stages {
+
+
+        stage('Build and Deploy') {
+            steps {
+
+                script {
+                  
+                    dockerHelmTask.call(env.CREDENTIAL_ID,env.IMAGE_NAME,env.VALUE_FILE,env.HELM_DEP_NAME,env.REPO)
+                }
+
+            }
         }
-      }
-    }
 
-    stage('Trivy Scan') {
-      steps {
-        script {
-          trivyScan(REGISTRY, env.BUILD_NUMBER)
-        }
-      }
     }
-
-    stage('Push to Registry') {
-      steps {
-        script {
-          dockerPush(REGISTRY, env.BUILD_NUMBER)
-        }
-      }
-    }
-
-    stage('Deploy to Kubernetes') {
-      steps {
-        script {
-          helmDeploy(SERVICE_NAME, VALUES_FILE, env.BUILD_NUMBER)
-        }
-      }
-    }
-  }
-
-  post {
-    failure {
-      slackNotify('FAILED', SERVICE_NAME)
-    }
-    success {
-      slackNotify('SUCCESS', SERVICE_NAME)
-    }
-  }
 }

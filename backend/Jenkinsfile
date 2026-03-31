@@ -4,9 +4,8 @@ pipeline {
     agent any
 
    parameters {
-        string defaultValue: 'main', name: 'branchName'
+        string defaultValue: 'main-v2', name: 'branchName'
     }
-
     environment {
 
         IMAGE_NAME = 'gcr.io/opsdev-org/status-be'

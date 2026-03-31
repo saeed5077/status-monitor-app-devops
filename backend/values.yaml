@@ -1,7 +1,7 @@
 service:
   name: status-be-service
   port: 8000
-  replicas: 2
+  replicas: 1
   type: ClusterIP
 
 image:
