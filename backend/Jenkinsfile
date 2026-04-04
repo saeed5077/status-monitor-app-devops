@@ -5,14 +5,13 @@ pipeline {
 
    parameters {
         string defaultValue: 'main-v2', name: 'branchName'
-        string defaultValue: "k8s", name: 'clusterName'
+        string defaultValue: "kuberenetes", name: 'clusterName'
+        string defaultValue: "us-central1-a", name: 'clusterZone'
     }
     environment {
 
-        IMAGE_NAME = 'gcr.io/opsdev-org/status-be'
+        REGISTRY = 'gcr.io/opsdev-org'
         VALUE_FILE = 'backend/values.yaml'
-        HELM_DEP_NAME = 'status-be'
-        IMAGE = 'status-be'
         CREDENTIAL_ID = 'gke-jenkins'
         REPO = 'backend'
     }
@@ -25,7 +24,7 @@ pipeline {
 
                 script {
                   
-                    dockerHelmTask.call(env.CREDENTIAL_ID,env.IMAGE_NAME,env.VALUE_FILE,env.HELM_DEP_NAME,env.REPO, params.clusterName)
+                    dockerHelmTask.call(env.CREDENTIAL_ID,env.REGISTRY,env.VALUE_FILE,env.JOB_NAME,env.REPO, params.clusterName,params.clusterZone)
                 }
 
             }
