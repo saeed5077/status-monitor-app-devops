@@ -1,60 +1,34 @@
-@Library('your-shared-library') _
+@Library('jenkins-shared-library') _
 
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    SERVICE_NAME = 'statuspage-backend'
-    REGISTRY = 'your-registry/statuspage-backend'
-    VALUES_FILE = 'backend/values.yaml'
-  }
+   parameters {
+        string defaultValue: 'main-v2', name: 'branchName'
+        string defaultValue: "kuberenetes", name: 'clusterName'
+        string defaultValue: "us-central1-a", name: 'clusterZone'
+    }
+    environment {
 
-  stages {
-    stage('Code Quality') {
-      steps {
-        sh 'pip install ruff && ruff check app/'
-      }
+        REGISTRY = 'gcr.io/opsdev-org'
+        VALUE_FILE = 'backend/values.yaml'
+        CREDENTIAL_ID = 'gke-jenkins'
+        REPO = 'backend'
     }
 
-    stage('Build Docker Image') {
-      steps {
-        script {
-          dockerBuild(REGISTRY, env.BUILD_NUMBER)
+    stages {
+
+
+        stage('Build and Deploy') {
+            steps {
+
+                script {
+                  
+                    dockerHelmTask.call(env.CREDENTIAL_ID,env.REGISTRY,env.VALUE_FILE,env.JOB_NAME,env.REPO, params.clusterName,params.clusterZone)
+                }
+
+            }
         }
-      }
-    }
 
-    stage('Trivy Scan') {
-      steps {
-        script {
-          trivyScan(REGISTRY, env.BUILD_NUMBER)
-        }
-      }
     }
-
-    stage('Push to Registry') {
-      steps {
-        script {
-          dockerPush(REGISTRY, env.BUILD_NUMBER)
-        }
-      }
-    }
-
-    stage('Deploy to Kubernetes') {
-      steps {
-        script {
-          helmDeploy(SERVICE_NAME, VALUES_FILE, env.BUILD_NUMBER)
-        }
-      }
-    }
-  }
-
-  post {
-    failure {
-      slackNotify('FAILED', SERVICE_NAME)
-    }
-    success {
-      slackNotify('SUCCESS', SERVICE_NAME)
-    }
-  }
 }
