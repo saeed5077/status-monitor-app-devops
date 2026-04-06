@@ -1,0 +1,99 @@
+name: Ephemeral PR Environment (GCP UAT)
+
+on:
+  pull_request:
+    branches:
+      - stage
+    types: [opened, synchronize, closed]
+
+env:
+  TF_WORKSPACE: "PR-${{ github.event.pull_request.number }}"
+
+jobs:
+  provision_and_trigger:
+    name: Provision GCP Infra & Trigger Jenkins
+    if: github.event.action == 'opened' || github.event.action == 'synchronize'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./terraform-repo/environment/uat
+
+    steps:
+      - name: Checkout App Code
+        uses: actions/checkout@v4
+
+      - name: Checkout Terraform IaC Code
+        uses: actions/checkout@v4
+        with:
+          repository: your-github-org/your-terraform-repo-name # ⚠️ REPLACE THIS
+          token: ${{ secrets.GH_PAT }} 
+          path: terraform-repo
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      # 4. Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 5. Initialize Terraform
+      - name: Terraform Init
+        run: terraform init
+
+      # 6. Create or Select the PR-specific Workspace
+      - name: Terraform Workspace Select or New
+        run: terraform workspace select ${{ env.TF_WORKSPACE }} || terraform workspace new ${{ env.TF_WORKSPACE }}
+
+      # 7. Apply the Infrastructure
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+      # 8. Trigger Jenkins to deploy the Application
+      - name: Trigger Jenkins Pipeline for App Deployment
+        run: |
+          curl -X POST "${{ secrets.JENKINS_URL }}/job/App-Deploy-PR/buildWithParameters" \
+          --user "${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_API_TOKEN }}" \
+          --data "PR_NUMBER=${{ github.event.pull_request.number }}"
+
+  teardown:
+    name: Destroy GCP Infrastructure
+    # Runs ONLY when the PR is merged or closed without merging
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./terraform-repo/environment/uat
+
+    steps:
+      - name: Checkout Terraform IaC Code
+        uses: actions/checkout@v4
+        with:
+          repository: your-github-org/your-terraform-repo-name # ⚠️ REPLACE THIS
+          token: ${{ secrets.GH_PAT }}
+          path: terraform-repo
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      # 3. Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 4. Initialize Terraform
+      - name: Terraform Init
+        run: terraform init
+
+      # 5. Destroy the PR-specific Infrastructure and cleanup workspace
+      - name: Terraform Destroy
+        run: |
+          terraform workspace select ${{ env.TF_WORKSPACE }}
+          terraform destroy -auto-approve
+          terraform workspace select default
+          terraform workspace delete ${{ env.TF_WORKSPACE }}
