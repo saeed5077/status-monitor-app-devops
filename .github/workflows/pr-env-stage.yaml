@@ -15,6 +15,11 @@ jobs:
     if: github.event.action == 'opened' || github.event.action == 'synchronize'
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./terraform-repo/environments/stage
+  
+
     steps:
       - name: Checkout App Code
         uses: actions/checkout@v4
@@ -34,7 +39,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
-
+   
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
@@ -63,7 +68,7 @@ jobs:
     
     defaults:
       run:
-        working-directory: ./terraform-repo/environment/stage
+        working-directory: ./terraform-repo/environments/stage
 
     steps:
       - name: Checkout Terraform IaC Code
