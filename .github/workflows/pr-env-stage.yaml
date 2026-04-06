@@ -40,7 +40,7 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ./terraform-repo/environment/stage
+        working-directory: ./terraform-repo/environments/stage
 
       - name: Terraform Workspace Select or New
         run: terraform workspace select ${{ env.TF_WORKSPACE }} || terraform workspace new ${{ env.TF_WORKSPACE }}
