@@ -31,8 +31,8 @@ jobs:
           token: ${{ secrets.GH_PAT }} 
           path: terraform-repo
 
-      - name: Debug structure
-        run: ls -R      
+      # - name: Debug structure
+      #   run: ls -R      
 
       - name: Authenticate to Google Cloud
         id: auth
@@ -47,11 +47,13 @@ jobs:
         run: terraform init
         working-directory: ./terraform-repo/environments/stage
 
-      - name: Terraform Workspace Select or New
-        run: terraform workspace select ${{ env.TF_WORKSPACE }} || terraform workspace new ${{ env.TF_WORKSPACE }}
+      # - name: Terraform Workspace Select or New
+      #   run: terraform workspace select ${{ env.TF_WORKSPACE }} || terraform workspace new ${{ env.TF_WORKSPACE }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        env:
+          TF_VAR_env: "pr-${{ github.event.pull_request.number }}"
 
       # # 8. Trigger Jenkins to deploy the Application
       # - name: Trigger Jenkins Pipeline for App Deployment
@@ -91,7 +93,9 @@ jobs:
 
       - name: Terraform Destroy
         run: |
-          terraform workspace select ${{ env.TF_WORKSPACE }}
+          # terraform workspace select ${{ env.TF_WORKSPACE }}
           terraform destroy -auto-approve
           terraform workspace select default
-          terraform workspace delete ${{ env.TF_WORKSPACE }}
+          # terraform workspace delete ${{ env.TF_WORKSPACE }}
+        env:
+          TF_VAR_env: "pr-${{ github.event.pull_request.number }}"  
