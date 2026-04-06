@@ -31,8 +31,8 @@ jobs:
           token: ${{ secrets.GH_PAT }} 
           path: terraform-repo
 
-      - name: Debug structure
-        run: ls -R      
+      # - name: Debug structure
+      #   run: ls -R      
 
       - name: Authenticate to Google Cloud
         id: auth
