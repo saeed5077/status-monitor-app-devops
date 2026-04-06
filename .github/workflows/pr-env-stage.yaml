@@ -23,6 +23,9 @@ jobs:
       - name: Checkout App Code
         uses: actions/checkout@v4
 
+      - name: Debug structure
+        run: ls -R  
+
       - name: Checkout Terraform IaC Code
         uses: actions/checkout@v4
         with:
