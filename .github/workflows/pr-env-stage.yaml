@@ -15,10 +15,6 @@ jobs:
     if: github.event.action == 'opened' || github.event.action == 'synchronize'
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./terraform-repo/environment/stage
-
     steps:
       - name: Checkout App Code
         uses: actions/checkout@v4
@@ -44,6 +40,7 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ./terraform-repo/environment/stage
 
       - name: Terraform Workspace Select or New
         run: terraform workspace select ${{ env.TF_WORKSPACE }} || terraform workspace new ${{ env.TF_WORKSPACE }}
