@@ -19,15 +19,15 @@ jobs:
       - name: Checkout App Code
         uses: actions/checkout@v4
 
-      - name: Debug structure
-        run: ls -R  
-
       - name: Checkout Terraform IaC Code
         uses: actions/checkout@v4
         with:
           repository: saeed5077/Terraform-IaaC
           token: ${{ secrets.GH_PAT }} 
           path: terraform-repo
+
+      - name: Debug structure
+        run: ls -R      
 
       - name: Authenticate to Google Cloud
         id: auth
