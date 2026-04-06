@@ -1,5 +1,4 @@
 # Status Page SaaS Platform
-##This is the test change
 A production-ready, multi-tenant white-label Status Page & Uptime Monitor SaaS platform with microservice architecture.
 
 ## Architecture
