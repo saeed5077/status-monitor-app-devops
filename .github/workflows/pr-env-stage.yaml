@@ -52,6 +52,8 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        env:
+          TF_VAR_env: "pr-${{ github.event.pull_request.number }}"
 
       # # 8. Trigger Jenkins to deploy the Application
       # - name: Trigger Jenkins Pipeline for App Deployment
@@ -95,3 +97,5 @@ jobs:
           terraform destroy -auto-approve
           terraform workspace select default
           # terraform workspace delete ${{ env.TF_WORKSPACE }}
+        env:
+          TF_VAR_env: "pr-${{ github.event.pull_request.number }}"  
