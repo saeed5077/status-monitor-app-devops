@@ -26,7 +26,7 @@ jobs:
       - name: Checkout Terraform IaC Code
         uses: actions/checkout@v4
         with:
-          repository: https://github.com/saeed5077/Terraform-IaaC.git
+          repository: saeed5077/Terraform-IaaC
           token: ${{ secrets.GH_PAT }} 
           path: terraform-repo
 
@@ -69,7 +69,7 @@ jobs:
       - name: Checkout Terraform IaC Code
         uses: actions/checkout@v4
         with:
-          repository: https://github.com/saeed5077/Terraform-IaaC
+          repository: saeed5077/Terraform-IaaC
           token: ${{ secrets.GH_PAT }}
           path: terraform-repo
 
