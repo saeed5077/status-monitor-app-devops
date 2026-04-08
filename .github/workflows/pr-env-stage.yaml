@@ -17,7 +17,8 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./terraform-repo/environment/stage
+        working-directory: ./terraform-repo/environments/stage
+  
 
     steps:
       - name: Checkout App Code
@@ -26,27 +27,33 @@ jobs:
       - name: Checkout Terraform IaC Code
         uses: actions/checkout@v4
         with:
-          repository: https://github.com/saeed5077/Terraform-IaaC
+          repository: saeed5077/Terraform-IaaC
           token: ${{ secrets.GH_PAT }} 
           path: terraform-repo
+
+      # - name: Debug structure
+      #   run: ls -R      
 
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
-
+   
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ./terraform-repo/environments/stage
 
-      - name: Terraform Workspace Select or New
-        run: terraform workspace select ${{ env.TF_WORKSPACE }} || terraform workspace new ${{ env.TF_WORKSPACE }}
+      # - name: Terraform Workspace Select or New
+      #   run: terraform workspace select ${{ env.TF_WORKSPACE }} || terraform workspace new ${{ env.TF_WORKSPACE }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        env:
+          TF_VAR_env: "pr-${{ github.event.pull_request.number }}"
 
       # # 8. Trigger Jenkins to deploy the Application
       # - name: Trigger Jenkins Pipeline for App Deployment
@@ -63,13 +70,13 @@ jobs:
     
     defaults:
       run:
-        working-directory: ./terraform-repo/environment/stage
+        working-directory: ./terraform-repo/environments/stage
 
     steps:
       - name: Checkout Terraform IaC Code
         uses: actions/checkout@v4
         with:
-          repository: https://github.com/saeed5077/Terraform-IaaC
+          repository: saeed5077/Terraform-IaaC
           token: ${{ secrets.GH_PAT }}
           path: terraform-repo
 
@@ -86,7 +93,9 @@ jobs:
 
       - name: Terraform Destroy
         run: |
-          terraform workspace select ${{ env.TF_WORKSPACE }}
+          # terraform workspace select ${{ env.TF_WORKSPACE }}
           terraform destroy -auto-approve
           terraform workspace select default
-          terraform workspace delete ${{ env.TF_WORKSPACE }}
+          # terraform workspace delete ${{ env.TF_WORKSPACE }}
+        env:
+          TF_VAR_env: "pr-${{ github.event.pull_request.number }}"  
