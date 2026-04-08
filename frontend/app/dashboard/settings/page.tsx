@@ -197,6 +197,7 @@ export default function SettingsPage() {
               <Input
                 placeholder="status.yourdomain.com"
                 value={formData.custom_domain}
+                disabled={domainStatus?.verified || tenant?.domain_verified}
                 onChange={(e) => {
                   setFormData({ ...formData, custom_domain: e.target.value });
                   setDomainStatus(null);
@@ -221,7 +222,7 @@ export default function SettingsPage() {
                       {domainStatus.verified ? 'Domain Verified ✓' : 'Verification Failed'}
                     </p>
                     <p className="text-gray-400 mt-1">{domainStatus.message}</p>
-                    {domainStatus.dns_records.length > 0 && (
+                    {domainStatus.dns_records && domainStatus.dns_records.length > 0 && (
                       <div className="mt-2 space-y-1">
                         <p className="font-medium text-xs text-gray-500">DNS records found:</p>
                         {domainStatus.dns_records.map((r, i) => (
@@ -234,60 +235,66 @@ export default function SettingsPage() {
               </div>
             )}
 
-            <div className="bg-gray-800 p-4 rounded-lg space-y-2">
-              <p className="font-medium text-sm text-gray-200">Setup Instructions:</p>
-              <ol className="list-decimal list-inside space-y-1.5 text-sm text-gray-500">
-                <li>Add an <code className="px-1.5 py-0.5 bg-gray-700 rounded text-xs">A</code> record or <code className="px-1.5 py-0.5 bg-gray-700 rounded text-xs">CNAME</code> pointing <strong className="text-gray-300">{formData.custom_domain || 'your domain'}</strong> to our server</li>
-                <li>Click <strong className="text-gray-300">Verify Domain</strong> to confirm DNS is configured</li>
-                <li>Once verified, Caddy will auto-provision a TLS certificate via Let&apos;s Encrypt</li>
-                <li>Your status page will be accessible at <strong className="text-gray-300">https://{formData.custom_domain || 'your-domain.com'}</strong></li>
-              </ol>
-            </div>
+            {!(domainStatus?.verified || tenant?.domain_verified) && (
+              <div className="bg-gray-800 p-4 rounded-lg space-y-2">
+                <p className="font-medium text-sm text-gray-200">Setup Instructions:</p>
+                <ol className="list-decimal list-inside space-y-1.5 text-sm text-gray-500">
+                  <li>Add an <code className="px-1.5 py-0.5 bg-gray-700 rounded text-xs">A</code> record or <code className="px-1.5 py-0.5 bg-gray-700 rounded text-xs">CNAME</code> pointing <strong className="text-gray-300">{formData.custom_domain || 'your domain'}</strong> to our server</li>
+                  <li>Click <strong className="text-gray-300">Verify Domain</strong> to confirm DNS is configured</li>
+                  <li>Once verified, Caddy will auto-provision a TLS certificate via Let&apos;s Encrypt</li>
+                  <li>Your status page will be accessible at <strong className="text-gray-300">https://{formData.custom_domain || 'your-domain.com'}</strong></li>
+                </ol>
+              </div>
+            )}
 
-            <div className="flex gap-2">
-              <Button onClick={handleSave} disabled={saving} variant="outline" className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800">
-                Save Domain
-              </Button>
-              <Button
-                onClick={async () => {
-                  if (!formData.custom_domain) {
-                    addToast({ title: 'Enter a domain first', variant: 'error' });
-                    return;
-                  }
-                  setVerifying(true);
-                  setDomainStatus(null);
-                  try {
-                    // Save domain first, then verify
-                    await tenantApi.updateMyTenant({ custom_domain: formData.custom_domain });
-                    const res = await domainApi.verify(formData.custom_domain);
-                    setDomainStatus(res.data);
-                    if (res.data.verified) {
-                      addToast({ title: 'Domain verified! TLS will be provisioned automatically.', variant: 'success' });
-                    } else {
-                      addToast({ title: 'DNS not pointing to our server yet', variant: 'error' });
+            {!(domainStatus?.verified || tenant?.domain_verified) && (
+              <div className="flex gap-2">
+                <Button onClick={handleSave} disabled={saving} variant="outline" className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800">
+                  Save Domain
+                </Button>
+                <Button
+                  onClick={async () => {
+                    if (!formData.custom_domain) {
+                      addToast({ title: 'Enter a domain first', variant: 'error' });
+                      return;
                     }
-                  } catch {
-                    addToast({ title: 'Verification failed', variant: 'error' });
-                  } finally {
-                    setVerifying(false);
-                  }
-                }}
-                disabled={verifying || !formData.custom_domain}
-                className="flex-1 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700"
-              >
-                {verifying ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Checking DNS...
-                  </div>
-                ) : (
-                  <>
-                    <Shield className="w-4 h-4 mr-2" />
-                    Verify Domain
-                  </>
-                )}
-              </Button>
-            </div>
+                    setVerifying(true);
+                    setDomainStatus(null);
+                    try {
+                      // Save domain first, then verify
+                      await tenantApi.updateMyTenant({ custom_domain: formData.custom_domain });
+                      const res = await domainApi.verify(formData.custom_domain);
+                      setDomainStatus(res.data);
+                      if (res.data.verified) {
+                        addToast({ title: 'Domain verified! TLS will be provisioned automatically.', variant: 'success' });
+                        // Update tenant verified state so UI stays hidden
+                        setTenant(t => t ? { ...t, domain_verified: true } : t); 
+                      } else {
+                        addToast({ title: 'DNS not pointing to our server yet', variant: 'error' });
+                      }
+                    } catch {
+                      addToast({ title: 'Verification failed', variant: 'error' });
+                    } finally {
+                      setVerifying(false);
+                    }
+                  }}
+                  disabled={verifying || !formData.custom_domain}
+                  className="flex-1 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700"
+                >
+                  {verifying ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Checking DNS...
+                    </div>
+                  ) : (
+                    <>
+                      <Shield className="w-4 h-4 mr-2" />
+                      Verify Domain
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 

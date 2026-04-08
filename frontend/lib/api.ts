@@ -10,8 +10,19 @@ const api = axios.create({
   },
 });
 
+const pendingRequests = new Map();
+
 // Attach JWT token from localStorage on every request
 api.interceptors.request.use((config) => {
+  // Cancel previous identical request to prevent duplicates
+  const requestKey = `${config.method}:${config.url}`;
+  if (pendingRequests.has(requestKey)) {
+    pendingRequests.get(requestKey).abort();
+  }
+  const controller = new AbortController();
+  config.signal = controller.signal;
+  pendingRequests.set(requestKey, controller);
+
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('token');
     if (token) {
@@ -20,6 +31,21 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => {
+    const requestKey = `${response.config.method}:${response.config.url}`;
+    pendingRequests.delete(requestKey);
+    return response;
+  },
+  (error) => {
+    if (error.config) {
+      const requestKey = `${error.config.method}:${error.config.url}`;
+      pendingRequests.delete(requestKey);
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const authApi = {
   register: (data: { name: string; email: string; password: string }) =>
