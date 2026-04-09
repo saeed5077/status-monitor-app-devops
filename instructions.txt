@@ -1,7 +1,7 @@
 Build a production-ready, multi-tenant white-label Status Page & Uptime Monitor SaaS platform with microservice architecture. Below is the complete specification:
 
 ---
-
+##
 ## PROJECT OVERVIEW
 
 A SaaS platform where businesses (tenants) sign up, configure their brand, add services to monitor, and get a fully white-labeled public status page on their own custom domain (e.g. status.theirdomain.com). Their end users visit that domain and see real-time service health, incidents, and can subscribe to alerts.
