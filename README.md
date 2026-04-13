@@ -1,4 +1,13 @@
 # StatusMonitor: Jenkins CI/CD & Ephemeral Infrastructure 🚀
+## 🏗 Architecture Overview
+
+<p align="center">
+  <a href="./statusmonitor-architecture.png">
+    <img src="./statusmonitor-architecture.png" alt="StatusMonitor Architecture" width="900"/>
+  </a>
+  <br/>
+  <em>Cloud-native CI/CD pipeline with Jenkins, Terraform, GKE, and dynamic staging environments</em>
+</p>
 
 A highly available, cloud-native status monitoring application deployed via a robust CI/CD pipeline. This project features automated security scanning, ephemeral staging environments, and on-the-fly SSL generation for service whitelabeling.
 
