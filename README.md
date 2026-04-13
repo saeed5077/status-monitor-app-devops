@@ -1,4 +1,4 @@
-# StatusMonitor 🚀
+# StatusMonitor: Jenkins CI/CD & Ephemeral Infrastructure 🚀
 
 A highly available, cloud-native status monitoring application deployed via a robust CI/CD pipeline. This project features automated security scanning, ephemeral staging environments, and on-the-fly SSL generation for service whitelabeling.
 
@@ -35,8 +35,8 @@ To optimize cloud costs and ensure isolated testing, the `Stage` environment is 
 
 This project follows a modular approach, separating application code from infrastructure and pipeline logic. 
 
-* **Infrastructure as Code (IaC):** [Terraform Infrastructure Repository](https://github.com/YOUR-USERNAME/YOUR-TERRAFORM-REPO) *(Replace with actual link)*
-* **Pipeline & Deployment:** [DevOps & Jenkins Shared Library Repository](https://github.com/YOUR-USERNAME/YOUR-DEVOPS-REPO) *(Replace with actual link)*
+* **Infrastructure as Code (IaC):** [Terraform Infrastructure Repository](https://github.com/saeed5077/Terraform-IaaC)
+* **Pipeline & Deployment:** [DevOps & Jenkins Shared Library Repository](https://github.com/saeed5077/DevOps)
 
 ## 📊 Monitoring
 
