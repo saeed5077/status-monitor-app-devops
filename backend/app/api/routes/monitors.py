@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, cast, Date, Integer
 from datetime import datetime, timedelta
@@ -27,6 +27,7 @@ async def list_monitors(
 @router.post("", response_model=MonitorResponse, status_code=status.HTTP_201_CREATED)
 async def create_monitor(
     request: MonitorCreate,
+    background_tasks: BackgroundTasks,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
@@ -45,6 +46,10 @@ async def create_monitor(
     db.add(monitor)
     await db.commit()
     await db.refresh(monitor)
+    
+    # Trigger an immediate check in the background
+    from app.services.monitor_worker import check_monitor
+    background_tasks.add_task(check_monitor, str(monitor.id))
     
     return MonitorResponse.model_validate(monitor)
 

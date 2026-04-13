@@ -10,6 +10,7 @@ from app.core.config import get_settings
 from app.services.notifier import send_confirmation_email
 from app.models.tenant import Subscriber, Tenant, IncidentStatus
 from app.schemas.tenant import SubscriberCreate, SubscriberResponse, ApiResponse
+from fastapi.responses import RedirectResponse
 from uuid import UUID
 
 router = APIRouter(prefix="/api/subscribers", tags=["subscribers"])
@@ -74,7 +75,7 @@ async def create_subscriber(
     )
 
 
-@router.get("/confirm/{token}", response_model=ApiResponse)
+@router.get("/confirm/{token}")
 async def confirm_subscriber(
     token: str,
     db: AsyncSession = Depends(get_db)
@@ -88,19 +89,14 @@ async def confirm_subscriber(
             detail="Invalid confirmation token"
         )
     
-    if subscriber.confirmed:
-        return ApiResponse(success=True, message="Email already confirmed")
+    if not subscriber.confirmed:
+        subscriber.confirmed = True
+        await db.commit()
     
-    subscriber.confirmed = True
-    await db.commit()
-    
-    return ApiResponse(
-        success=True,
-        message="Your subscription has been confirmed!"
-    )
+    return RedirectResponse(f"{settings.FRONTEND_URL}/subscription/success")
 
 
-@router.get("/unsubscribe/{token}", response_model=ApiResponse)
+@router.get("/unsubscribe/{token}")
 async def unsubscribe(
     token: str,
     db: AsyncSession = Depends(get_db)
@@ -117,10 +113,7 @@ async def unsubscribe(
     await db.delete(subscriber)
     await db.commit()
     
-    return ApiResponse(
-        success=True,
-        message="You have been unsubscribed successfully."
-    )
+    return RedirectResponse(f"{settings.FRONTEND_URL}/subscription/unsubscribed")
 
 
 @router.get("", response_model=List[SubscriberResponse])

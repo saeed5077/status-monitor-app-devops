@@ -3,6 +3,7 @@ export interface Tenant {
   name: string;
   slug: string;
   custom_domain: string | null;
+  domain_verified: boolean;
   logo_url: string | null;
   brand_color: string;
   owner_email: string;
