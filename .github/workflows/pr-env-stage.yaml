@@ -19,7 +19,7 @@ jobs:
     #   run:
     #     working-directory: ./terraform-repo/environments/stage
 
-    steps:
+    # steps:
       # - name: Checkout App Code
       #   uses: actions/checkout@v4
 
