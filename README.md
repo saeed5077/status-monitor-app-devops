@@ -57,3 +57,4 @@ The infrastructure and application health are monitored using the **kube-prometh
 
 * **Whitelabeling:** Using **Caddy** as a reverse proxy allows the application to serve multiple custom domains dynamically, with Caddy automatically provisioning and renewing Let's Encrypt SSL certificates on the fly.
 * **Secret Management:** No secrets are hardcoded. SonarQube strictly enforces this during the CI process.
+##Test-change
