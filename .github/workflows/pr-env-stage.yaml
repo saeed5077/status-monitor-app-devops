@@ -56,7 +56,7 @@ jobs:
 
   deploy-services:
     name: Deploy FE & BE
-    needs: provision-infra
+    # needs: provision-infra
     runs-on: ubuntu-latest
 
     strategy:
